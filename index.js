@@ -72,7 +72,7 @@ function appOrigin(stack,recur){
     }
   }
 
-  //if(last.indexOf('(timers.js') != -1 || last.indexOf('weak.js') != -1){
+  //if(last.indexOf('(timers.js') != -1 || last.indexOf('weak-tracker/index.js') != -1){
   //}
 
   return last.trim();

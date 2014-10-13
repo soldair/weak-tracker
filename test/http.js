@@ -32,6 +32,8 @@ test("can i track weak refs on requests",function(){
         console.log('response body> ',body+'');
       }))
     })
+
+    if(global.gc) gc();
     console.log(wt.refs);
   },5000);
 
