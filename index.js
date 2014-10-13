@@ -1,7 +1,7 @@
 var weak = require("weak");
 var EventEmitter = require('events').EventEmitter;
 
-//for more information about where leaked objects are first created
+//for more information about which code path of yours results in these leaked objects
 //Error.stackTraceLimit = 20;
 
 // singleton.
