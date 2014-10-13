@@ -1,0 +1,21 @@
+{
+  "name": "weak-tracker",
+  "description": "Track weak refs fopr debugging leaks.",
+  "version": "0.0.0",
+  "repository": {
+    "url": "git://github.com/soldair/weak-tracker.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "author": "Ryan Day",
+  "dependencies": {
+    "weak": "^0.3.3"
+  },
+  "devDependencies": {
+    "concat-stream": "^1.4.6",
+    "hyperquest": "^0.3.0",
+    "tape": "^3.0.0"
+  }
+}
