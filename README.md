@@ -55,10 +55,10 @@ this is what refs will looks like if you do not call gc first.
 ```
 { request: 
    { _total: 2,
-     'at Server.requestHandler (/home/soldair/Projects/opensource/weak-tracker/test/http.js:19:8)': 2 },
+     'at Server.requestHandler (...../opensource/weak-tracker/test/http.js:19:8)': 2 },
   response: 
    { _total: 2,
-     'at Server.requestHandler (/home/soldair/Projects/opensource/weak-tracker/test/http.js:20:8)': 2 } }
+     'at Server.requestHandler (...../opensource/weak-tracker/test/http.js:20:8)': 2 } }
 
 ```
 
@@ -67,5 +67,5 @@ with expose gc and calling gc() before lookling at refs you know its only object
 ```
 { request: 
    { _total: 2,
-     'at Server.requestHandler (/home/soldair/Projects/opensource/weak-tracker/test/http.js:19:8)': 2 } }
+     'at Server.requestHandler (...../opensource/weak-tracker/test/http.js:19:8)': 2 } }
 ```
