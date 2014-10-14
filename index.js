@@ -10,11 +10,15 @@ module.exports = function fn(){
   return fn.active;
 }
 
+
 module.exports.WeakTracker = function(){
 
+  var id = 0;
   var em = new EventEmitter();
 
   em.refs = {};
+  em._weak = {};
+
   em.track = function(key,obj){
 
     var origin = appOrigin();
@@ -31,13 +35,26 @@ module.exports.WeakTracker = function(){
     em.refs[key][origin]++;
     em.refs[key]._total++;
 
-    weak(obj,gcCb(key,origin))
+    id = incId(id);
+    // hold the actual weak ref instance so we can introspect objects that are not getting gc'ed
+    em._weak[id] = weak(obj,gcCb(key,origin,id));
+    // return the weak because ^ is just for internal book keeping.
+    return em._weak[id];
   }
 
-  function gcCb(key,origin){
+  function gcCb(key,origin,id){
     return function(){
+ 
+      var ref = em._weak[id];
+      if(!ref) {
+        this.emit('log',"gc event with no weak ref in map.",key,origin,id);
+        // someone may have manually cleaned out _weak. =/
+        return;
+      }
 
-      em.emit('gc',key,origin); 
+      delete em._weak[id];
+
+      em.emit('gc',key,origin,ref); 
 
       em.refs[key][origin]--;
       em.refs[key]._total--;
@@ -81,4 +98,8 @@ function appOrigin(stack,recur){
 
 
 
-
+function incId(id){
+  ++id;
+  if(id == 9007199254740992) id = 0;
+  return id; 
+}

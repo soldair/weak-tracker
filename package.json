@@ -1,13 +1,13 @@
 {
   "name": "weak-tracker",
   "description": "Track weak refs for debugging memory leaks.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": {
     "url": "git://github.com/soldair/weak-tracker.git"
   },
   "main": "index.js",
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "for test in `find test/ | grep .js` ;do node --expose-gc $test; if [ $? != 0 ]; then exit $?; fi done;"
   },
   "author": "Ryan Day",
   "dependencies": {
