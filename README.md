@@ -80,9 +80,9 @@ what is this line number business?
 ----------------------------------
 
 the first line as i traverse up the stack that does not belong to a nested node module is included with the reference tracking.
-this lets you place debug weak-tracker calls in nested node modules so you can see which of your code paths result in a leak of .. lets say mongo embeded documents for example.
+this lets you place debug weak-tracker calls in nested node modules so you can see which of your code paths result in a leak of .. lets say mongo embeded documents.
 
 i use the module strong-memwatch to find what objects are leaking in nested modules. the gc function of strong memwatch is an incomplete gc. if you use it rather than --expose-gc refs will appear active that are sill scheduled for a future gc.
-its better than nothing if you can usxe the stop the world gc in whatever environment you are running.
+its better than nothing if you can't use the full stop the world gc in whatever environment you are running.
 
 

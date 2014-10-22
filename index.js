@@ -19,6 +19,9 @@ module.exports.WeakTracker = function(){
   em.refs = {};
   em._weak = {};
 
+  // expose weak
+  em.weak = weak;
+
   em.track = function(key,obj){
 
     var origin = appOrigin();
@@ -37,17 +40,33 @@ module.exports.WeakTracker = function(){
 
     id = incId(id);
     // hold the actual weak ref instance so we can introspect objects that are not getting gc'ed
-    em._weak[id] = weak(obj,gcCb(key,origin,id));
-    // return the weak because ^ is just for internal book keeping.
-    return em._weak[id];
+    var callback = gcCb(key,origin,id);
+    var ref = weak(obj,callback);
+    //
+    // for some reason gc events are not always called. this leaves us in a weird state.
+    // i have references to dead weakRefs
+    // i can detect that they are dead via weak.isDead 
+    // i cannot call weak.callbacks(weakRef) because the ref is dead and this fails assertion
+    //   ./src/weakref.cc:65: v8::Handle<v8::Object> {anonymous}::GetEmitter(v8::Handle<v8::Object>): Assertion `cont != __null' failed.
+    //   ... Aborted ... (Core Dumped) ... 
+    // so have to store the ref, callback, and key so i can manually cleanup orphaned objects and fire gc events for forgotten refs.
+    //
+    em._weak[id] = {ref:ref,cb:callback,key:key};
+
+    // return the id for lookup in ^ with getRef
+    return id
+  }
+
+  em.getRef = function(id){
+    return em._weak[id]?em._weak[id].ref:undefined;
   }
 
   function gcCb(key,origin,id){
     return function(){
  
-      var ref = em._weak[id];
+      var ref = em._weak[id].ref;
       if(!ref) {
-        this.emit('log',"gc event with no weak ref in map.",key,origin,id);
+        em.emit('log',"gc event with no weak ref in map.",key,origin,id);
         // someone may have manually cleaned out _weak. =/
         return;
       }
@@ -67,6 +86,18 @@ module.exports.WeakTracker = function(){
       }
     }
   }
+
+  var intr = setInterval(function cleanOrphanedWeakrefs(){
+    Object.keys(em._weak).forEach(function(k){
+      if(weak.isDead(em._weak[k].ref)){
+        // because the object is already dead and we missed the nearDeath callback event from the v8 gc we have to pass undefined as the object.
+        em._weak[k].cb(undefined);
+      }
+    });
+  },1000);
+
+  em.sweepInterval = intr;
+  if(intr.unref) intr.unref();
 
   return em;
 }
